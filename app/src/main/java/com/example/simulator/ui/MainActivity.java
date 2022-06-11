@@ -1,5 +1,7 @@
 package com.example.simulator.ui;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -15,6 +17,7 @@ import com.example.simulator.ui.adapter.MatchesAdapter;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.util.List;
+import java.util.Random;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -27,7 +30,6 @@ public class MainActivity extends AppCompatActivity {
     private MatchesApi matchesApi;
 
     MatchesAdapter adapter;
-
 
 
 
@@ -62,43 +64,74 @@ public class MainActivity extends AppCompatActivity {
         LinearLayoutManager layout = new LinearLayoutManager(this);
         binding.rvSimulator.setLayoutManager(layout);
 
+        findMatchesFromApi();
+    }
+
+    private void setupMatchesRefresh() {
+        //para quando atualizar
+        binding.swiperSimulator.setOnRefreshListener(this::findMatchesFromApi);
+    }
+
+    private void findMatchesFromApi() {
+        //fazer aparecer o item de carregamento
+        binding.swiperSimulator.setRefreshing(true);
+
         matchesApi.getMatches().enqueue(new Callback<List<Matches>>() {
             @Override
             public void onResponse(Call<List<Matches>> call, Response<List<Matches>> response) {
-                if (response.isSuccessful()){
+                if (response.isSuccessful()) {
                     List<Matches> matches = response.body();
-                    Log.i("INFO SIMULATOR","Deu certo!*******************"+matches.size());
+                    Log.i("INFO SIMULATOR", "Deu certo!*******************" + matches.size());
                     adapter = new MatchesAdapter(matches);
                     binding.rvSimulator.setAdapter(adapter);
 
-
-
-                }else {
+                } else {
                     showErroMensage();
-
-                    Log.i("INFO ERRO","ERRO***********************");
+                    Log.i("INFO ERRO", "ERRO***********************");
                 }
+
+                binding.swiperSimulator.setRefreshing(false);
             }
 
             @Override
             public void onFailure(Call<List<Matches>> call, Throwable t) {
-             //   showErroMensage();
+                //   showErroMensage();
+                showErroMensage();
+                binding.swiperSimulator.setRefreshing(false);
             }
         });
     }
 
 
-
-    private void setupMatchesRefresh() {
-        //TODO: atualizar as partidas com o metodo Swipper.
-    }
-
     private void setupMatchesFloatActionButton() {
-        //TODO: criar evento de click e simulação de partidas.
+        binding.fabSimulator.setOnClickListener(view -> {
+
+            //meio Segundo | conceito add do JetPack
+            view.animate().rotationBy(360).setDuration(500).setListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    super.onAnimationEnd(animation);
+                    Random random = new Random();
+
+                    for (int i = 0; i < adapter.getItemCount(); i++) {
+                        Matches match = adapter.getMatch().get(i);
+
+                        //utilizar a class Random para gerar de forma automatica o plcacar
+                        match.getTemHome().setScrore(random.nextInt(match.getTemHome().getStars() + 1) );
+                        match.getAllTeam().setScrore(random.nextInt(match.getAllTeam().getStars() + 1) );
+
+                        //informar ao adapter que o item da lista mudou
+                        adapter.notifyItemChanged(i);
+                    }
+                }
+
+            });
+
+        });
     }
 
 
     private void showErroMensage() {
-        Snackbar.make(binding.fabSimulator,"erro",Snackbar.LENGTH_LONG).show();
+        Snackbar.make(binding.fabSimulator, "erro", Snackbar.LENGTH_LONG).show();
     }
 }
