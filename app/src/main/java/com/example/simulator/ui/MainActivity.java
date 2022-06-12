@@ -133,6 +133,9 @@ public class MainActivity extends AppCompatActivity {
 
             });
 
+                //causar um erro de proposito para o firebase CrashLytics
+            //throw new  RuntimeException("Erro analitc");
+
         });
     }
 
