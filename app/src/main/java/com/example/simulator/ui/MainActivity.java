@@ -74,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setupMatchesRefresh() {
-        //para quando atualizar
+        //para quando atualizar teste
         binding.swiperSimulator.setOnRefreshListener(this::findMatchesFromApi);
     }
 
