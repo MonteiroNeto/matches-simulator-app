@@ -19,6 +19,8 @@ class DetailActivity : AppCompatActivity() {
         binding = ActivityDetailBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        supportActionBar?.hide()
+
         loadMatchFromExtra()
     }
 
@@ -26,7 +28,7 @@ class DetailActivity : AppCompatActivity() {
         intent?.extras?.getParcelable<Matches>(Extras.EXTRAS_INTENT_PUT)?.let {
 
             Glide.with(this).load(it.place.imagem).into(binding.ivPlaceEstadio)
-            supportActionBar?.setTitle(it.place.name)
+            binding.tvPlaceScreenDetail.setText(it.place.name)
 
 
             binding.tvDescriptionScreenDetail.setText(it.description)

@@ -16,6 +16,9 @@ import com.example.simulator.domain.Matches;
 import com.example.simulator.ui.adapter.MatchesAdapter;
 import com.google.android.material.snackbar.Snackbar;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
@@ -30,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
     private MatchesApi matchesApi;
 
     MatchesAdapter adapter;
+    List<Matches> matches = new ArrayList<>(Collections.EMPTY_LIST);
 
 
 
@@ -63,6 +67,8 @@ public class MainActivity extends AppCompatActivity {
     private void setupMatchesLists() {
         LinearLayoutManager layout = new LinearLayoutManager(this);
         binding.rvSimulator.setLayoutManager(layout);
+        adapter = new MatchesAdapter(matches);
+        binding.rvSimulator.setAdapter(adapter);
 
         findMatchesFromApi();
     }
@@ -80,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<List<Matches>> call, Response<List<Matches>> response) {
                 if (response.isSuccessful()) {
-                    List<Matches> matches = response.body();
+                    matches = response.body();
                     Log.i("INFO SIMULATOR", "Deu certo!*******************" + matches.size());
                     adapter = new MatchesAdapter(matches);
                     binding.rvSimulator.setAdapter(adapter);
